@@ -119,16 +119,15 @@ class ResultWindow(QWidget):
 
         layout = QVBoxLayout()
 
-        # Add a label for the full text
-        full_text_label = QLabel(f"Full Text:\n{' '.join(input_texts)}")
-        full_text_label.setFont(QFont("Verdana", 12))
-        layout.addWidget(full_text_label)
+        if classification_by_sentence:
+            full_text_label = QLabel(f"Full Text:\n{' '.join(input_texts)}")
+            full_text_label.setFont(QFont("Verdana", 12))
+            layout.addWidget(full_text_label)
 
-        # Add a separator
-        separator_full_text = QFrame()
-        separator_full_text.setFrameShape(QFrame.HLine)
-        separator_full_text.setFrameShadow(QFrame.Sunken)
-        layout.addWidget(separator_full_text)
+            separator_full_text = QFrame()
+            separator_full_text.setFrameShape(QFrame.HLine)
+            separator_full_text.setFrameShadow(QFrame.Sunken)
+            layout.addWidget(separator_full_text)
 
         for i, input_text in enumerate(input_texts):
             result_message = (
@@ -227,7 +226,6 @@ class ModelInfoWindow:
 
 
 def classify_text(model, text_to_classify):
-    print()
     print("Sentence:", text_to_classify)
     predicted_emotion = model.predict([text_to_classify])
     return predicted_emotion[0]
@@ -253,8 +251,11 @@ def suggest_emojis(model, text):
         sentences = [text]
     suggested_emojis_result = []
     predicted_emotions = []
+    if classification_by_sentence:
+        print("Full text:", text)
     for sent in sentences:
         temp = []
+        print()
         predicted_emotion = classify_text(model, sent)
         predicted_emotions.append(predicted_emotion)
         print("Predicted emotion:", predicted_emotion)
