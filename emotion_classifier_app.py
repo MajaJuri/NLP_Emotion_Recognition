@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import re
 import string
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import pickle
@@ -15,8 +15,10 @@ from PIL import Image, ImageTk
 from transformers import RobertaTokenizer
 import emoji
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QFrame
 from PyQt5.QtGui import QFont
+from keras.models import load_model
+from keras.preprocessing.sequence import pad_sequences
 
 emotions = ['happiness',
             'fear',
@@ -105,38 +107,56 @@ def open_model_page(name_of_model):
 
 
 class ResultWindow(QWidget):
-    def __init__(self, input_text, predicted_emotion, suggested_emojis, name_of_model):
+    def __init__(self, input_texts, predicted_emotions, suggested_emojis, name_of_model):
         super().__init__()
-
-        result_message = (
-            f"Input Text:\n{input_text}\n\nPredicted Emotion: {predicted_emotion}\n\nSuggested Emojis:"
-        )
 
         layout = QVBoxLayout()
 
-        label = QLabel(result_message)
-        label.setFont(QFont("Verdana", 12))
-        layout.addWidget(label)
+        # Add a label for the full text
+        full_text_label = QLabel(f"Full Text:\n{' '.join(input_texts)}")
+        full_text_label.setFont(QFont("Verdana", 12))
+        layout.addWidget(full_text_label)
 
-        emoji_message = (
-            f" {' '.join(suggested_emojis)}"
-        )
+        # Add a separator
+        separator_full_text = QFrame()
+        separator_full_text.setFrameShape(QFrame.HLine)
+        separator_full_text.setFrameShadow(QFrame.Sunken)
+        layout.addWidget(separator_full_text)
 
-        label = QLabel(emoji_message)
-        label.setFont(QFont("Verdana", 20))
-        layout.addWidget(label)
+        for i, input_text in enumerate(input_texts):
+            result_message = (
+                f"Input Text:\n{input_text}\n\nPredicted Emotion: {predicted_emotions[i]}\n\nSuggested Emojis:"
+            )
+
+            label = QLabel(result_message)
+            label.setFont(QFont("Verdana", 12))
+            layout.addWidget(label)
+
+            emoji_message = (
+                f" {' '.join(suggested_emojis[i])}"
+            )
+
+            emoji_label = QLabel(emoji_message)
+            emoji_label.setFont(QFont("Verdana", 20))
+            layout.addWidget(emoji_label)
+
+            # Add a separator between individual results
+            if i < len(input_texts) - 1:
+                separator_result = QFrame()
+                separator_result.setFrameShape(QFrame.HLine)
+                separator_result.setFrameShadow(QFrame.Sunken)
+                layout.addWidget(separator_result)
 
         layout.setContentsMargins(20, 20, 20, 20)
 
         self.setLayout(layout)
         self.setWindowTitle(f"Classification Result for {name_of_model}")
-
         self.setGeometry(100, 100, 600, 400)
 
 
-def show_result2(input_text, predicted_emotion, suggested_emojis, name_of_model):
+def show_result2(input_text, predicted_emotions, suggested_emojis, name_of_model):
     app = QApplication(sys.argv)
-    window = ResultWindow(input_text, predicted_emotion, suggested_emojis, name_of_model)
+    window = ResultWindow(input_text, predicted_emotions, suggested_emojis, name_of_model)
     window.show()
     app.exec_()
 
@@ -161,21 +181,21 @@ class ModelInfoWindow:
         title_label = ttk.Label(self.root, text=name_of_model, font=("Verdana", 20))
         title_label.grid(row=0, column=0, columnspan=7, pady=20, sticky='n')
 
-        description_label = ttk.Label(self.root, text=f"{description}", font=("Verdana", 12))
-        description_label.grid(row=1, column=0, columnspan=3, pady=10, sticky='w')
+        description_label = ttk.Label(self.root, text=f"{description}", font=("Verdana", 10), wraplength=400, anchor='w')
+        description_label.grid(row=1, column=0, columnspan=7, pady=10, padx=10, sticky='w')
 
         accuracy_label = ttk.Label(self.root, text=f"Accuracy: {accuracy}", font=("Verdana", 12))
-        accuracy_label.grid(row=2, column=0, columnspan=3, pady=10, sticky='w')
+        accuracy_label.grid(row=2, column=0, columnspan=3, pady=10, padx=10, sticky='w')
 
         # Load and display the image on the right with a larger size
         if image_filename:
-            image_path = f"images/{image_filename}"  # Update the path as needed
+            image_path = f"images/{image_filename}"
             image = Image.open(image_path)
             image.thumbnail((350, 350))
             tk_image = ImageTk.PhotoImage(image)
 
             image_label = ttk.Label(self.root, image=tk_image)
-            image_label.grid(row=1, column=5, rowspan=4, padx=20, pady=10, sticky='e')
+            image_label.grid(row=1, column=7, rowspan=4, padx=20, pady=10, sticky='e')
 
             image_label.image = tk_image
 
@@ -186,16 +206,19 @@ class ModelInfoWindow:
                                      width=20)
         classify_button.grid(row=3, column=3, pady=10, padx=10, sticky='w')
 
+
+
     def show_result(self, name_of_model):
         input_text = self.text_entry.get("1.0", tk.END)
-        predicted_emotion = classify_text(self.model, self.text_entry.get("1.0", tk.END))
-        suggested_emojis = suggest_emojis(self.model, self.text_entry.get("1.0", tk.END))
+        #predicted_emotion = classify_text(self.model, self.text_entry.get("1.0", tk.END))
+        suggested_emojis, predicted_emotions = suggest_emojis(self.model, self.text_entry.get("1.0", tk.END))
 
-        show_result2(input_text, predicted_emotion, suggested_emojis, name_of_model)
+        show_result2(sent_tokenize(input_text), predicted_emotions, suggested_emojis, name_of_model)
 
 
 def classify_text(model, text_to_classify):
-    print(text_to_classify)
+    print()
+    print("Sentence:", text_to_classify)
     predicted_emotion = model.predict([text_to_classify])
     return predicted_emotion[0]
 
@@ -207,27 +230,33 @@ def suggest_emojis_from_text(text):
         suggested_emoji = emoji.emojize(f":{word}:")
         if suggested_emoji != f":{word}:":
             suggested_emojis.append(suggested_emoji)
-        suggested_emoji = adv.emoji_search(word)['emoji'].to_list()
+        suggested_emoji = adv.emoji_search(word)['emoji'].head(3).to_list()
         if suggested_emoji is not None:
             suggested_emojis.extend(suggested_emoji)
     return suggested_emojis
 
 
 def suggest_emojis(model, text):
-    predicted_emotion = classify_text(model, text)
-    print("Predicted emotion:", predicted_emotion)
-    # from keywords
-    suggested_emojis = []
-    for suggestion in emoji_keywords[predicted_emotion]:
-        search_result = (adv.emoji_search(suggestion)['emoji'].head(3)).to_list()
-        suggested_emojis.extend(search_result)
+    sentences = sent_tokenize(text)
+    suggested_emojis_result = []
+    predicted_emotions = []
+    for sent in sentences:
+        temp = []
+        predicted_emotion = classify_text(model, sent)
+        predicted_emotions.append(predicted_emotion)
+        print("Predicted emotion:", predicted_emotion)
+        # from emotion keywords
+        for suggestion in emoji_keywords[predicted_emotion]:
+            search_result = (adv.emoji_search(suggestion)['emoji'].head(3)).to_list()
+            temp.extend(search_result)
 
-    # jos dodamo na temelju teksta
-    suggested_emojis.extend(suggest_emojis_from_text(text))
+        # jos dodamo na temelju teksta
+        temp.extend(suggest_emojis_from_text(sent))
 
-    suggested_emojis = set(suggested_emojis)
-    print("Suggested emojis: ", ' '.join(suggested_emojis))
-    return suggested_emojis
+        suggested_emojis_set = set(temp)
+        print("Suggested emojis: ", ' '.join(suggested_emojis_set))
+        suggested_emojis_result.append(suggested_emojis_set)
+    return suggested_emojis_result, predicted_emotions
 
 
 # ucitavanje podataka koji su zapisani u datoteku
@@ -238,18 +267,19 @@ with open('info_file.json', 'r', encoding='utf-8') as file:
 naive_bayes_model = joblib.load('models/naive_bayes_pipeline.pkl', 'r')
 logistic_regression_model = joblib.load('models/logistic_regression_pipeline.pkl', 'r')
 svm_model = joblib.load('models/svm_pipeline.pkl', 'r')
+#bilstm_model = load_model('models/bilstm_model.keras')
 roberta_model = pickle.load(open('models/RoBERTa.pkl', 'rb'))
 # bert_model = ktrain.load_predictor("models/bert_model")
 
 models = {'Naive Bayes': naive_bayes_model,
           'Logistic Regression': logistic_regression_model,
           'SVM': svm_model,
-          # 'BiLSTM': bilstm_model,
+          #'BiLSTM': bilstm_model,
           # 'BERT': bert_model,
           'RoBERTa': roberta_model
           }
 
-work_from_console = True
+work_from_console = False
 
 if work_from_console:
     while True:
@@ -291,7 +321,7 @@ else:
     root.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
 
     # naslov
-    title_label = ttk.Label(root, text=data['title'], font=("Verdana", 20))
+    title_label = ttk.Label(root, text=data['title'], font=("Verdana", 20), wraplength=700, anchor='center', justify='center')
     title_label.pack(side=tk.TOP, pady=20)
 
     # podnaslov
@@ -299,7 +329,7 @@ else:
     authors_label.pack(side=tk.TOP)
 
     # opis
-    description_label = ttk.Label(root, text=data['description'], font=("Verdana", 12))
+    description_label = ttk.Label(root, text=data['description'], font=("Verdana", 10), wraplength=750, anchor='center', justify='center')
     description_label.pack(side=tk.TOP, pady=10)
 
     # namjestanje gumba
