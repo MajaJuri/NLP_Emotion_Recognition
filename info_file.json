@@ -1,0 +1,44 @@
+{
+   "models":{
+      "Naive Bayes":{
+         "info":"Naive Bayes is a probabilistic classification algorithm based on Bayes' theorem, with the \"naive\" assumption that features are conditionally independent given the class label. Despite this simplification, Naive Bayes has proven to be remarkably effective in various applications. In the context of emotion classification, Naive Bayes models can be trained to predict the emotional content of text based on the occurrence of specific words or features. By leveraging the probabilities associated with different emotional classes, Naive Bayes classifiers can quickly and efficiently categorize text into predefined emotional categories, making them valuable tools for understanding and interpreting the sentiment conveyed in textual data.",
+         "model_file_name":"naive_bayes_model",
+         "accuracy":"58%",
+         "f1":"0.58",
+         "confusion_matrix_file_name":"naive_bayes_confusion_matrix.png"
+      },
+      "Logistic Regression":{
+         "info":"Logistic Regression is a statistical method used for binary and multiclass classification problems. Logistic regression models predict the probability of an input belonging to a particular class using the logistic function. Logistic regression can be employed to predict the probability of different emotions associated with a given piece of text. By training on labeled datasets, the logistic regression model learns to assign weights to features, such as specific words or linguistic patterns, that are indicative of different emotional states.",
+         "model_file_name":"logistic_regression_model",
+         "accuracy":"64.32%",
+         "f1":"0.6432",
+         "confusion_matrix_file_name":"logistic_regression_confusion_matrix.png"
+      },
+      "SVM":{
+         "info":"Support Vector Machines (SVM) SVM works by finding the optimal hyperplane that maximally separates data points belonging to distinct classes in a high-dimensional space. In emotion classification, SVM analyzes textual features extracted from input sentences, discerning subtle nuances in language to predict the underlying emotions accurately. The algorithm's ability to handle non-linear relationships and adapt to various text structures makes it valuable in deciphering the emotional content of sentences, contributing to its significance in sentiment analysis and emotion prediction applications.",
+         "model_file_name":"svm_model",
+         "accuracy":"68.60%",
+         "f1":"0.686",
+         "confusion_matrix_file_name":"svm_confusion_matrix.png"
+      },
+      "BiLSTM":{
+         "info":"bilstm info text example",
+         "model_file_name":"bilstm_model"
+      },
+      "BERT":{
+         "info":"bert info text example",
+         "model_file_name":"bert_model",
+         "accuracy":"72%",
+         "confusion_matrix_file_name":"bert_confusion_matrix.png"
+      },
+      "RoBERTa":{
+         "info":"RoBERTa, or Robustly optimized BERT approach enhances pretraining techniques, refining masked language modeling and training on a more extensive dataset to achieve superior performance in understanding context and semantics within textual data. In the realm of emotion classification, RoBERTa exhibits exceptional capabilities in capturing intricate contextual relationships and nuances present in sentences.",
+         "model_file_name":"roberta_model",
+         "accuracy":"73%",
+         "confusion_matrix_file_name":"roberta_confusion_matrix.png"
+      }
+   },
+   "description":"This Emoji Suggestion Tool is a user-friendly graphical interface designed to enhance communication and expression by suggesting relevant emojis based on the emotion and the content of the input text. Once you have selected a language model that you want to generate the emoji suggestions with, you can enter text into the provided input box, the program will intelligently analyze the content offering a curated selection of emojis that complement the conveyed emotions in your input text.",
+   "authors":"Maja Jurić, Maria Fain, Klara Iličić",
+   "title":"A Comparative Study of Language Models for Emoji Suggestions"
+}
