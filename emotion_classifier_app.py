@@ -1,10 +1,8 @@
 import os
-os.environ['TF_USE_LEGACY_KERAS'] = 'True'  # mora bit na pocetku prije nego se importa keras ili tensorflow
-import warnings
-warnings.filterwarnings('ignore')
+os.environ['TF_USE_LEGACY_KERAS'] = 'True'  # mora bit na pocetku prije nego se importa keras ili tensorflow, za berta
+import ktrain
 import tkinter as tk
 from tkinter import ttk, messagebox
-import ktrain
 import re
 import string
 from nltk.tokenize import word_tokenize, sent_tokenize
@@ -24,8 +22,9 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QFrame
 from PyQt5.QtGui import QFont
 from keras.models import load_model
 from keras.preprocessing.sequence import pad_sequences
-
-
+import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
 
 emotions = ['happiness',
             'fear',
@@ -48,6 +47,7 @@ emoji_keywords = {
     'surprise': ['scream']
 }
 
+MAX_LEN = 300
 
 # treba za RoBERTu
 class EmotionClassifier(nn.Module):
@@ -216,11 +216,14 @@ class ModelInfoWindow:
 
 
     def show_result(self, name_of_model):
+        print("Model:", name_of_model)
         input_text = self.text_entry.get("1.0", tk.END)
         #predicted_emotion = classify_text(self.model, self.text_entry.get("1.0", tk.END))
         suggested_emojis, predicted_emotions = suggest_emojis(self.model, self.text_entry.get("1.0", tk.END))
-
-        show_result2(sent_tokenize(input_text), predicted_emotions, suggested_emojis, name_of_model)
+        if classification_by_sentence:
+            show_result2(sent_tokenize(input_text), predicted_emotions, suggested_emojis, name_of_model)
+        else:
+            show_result2([input_text], predicted_emotions, suggested_emojis, name_of_model)
 
 
 def classify_text(model, text_to_classify):
@@ -244,7 +247,10 @@ def suggest_emojis_from_text(text):
 
 
 def suggest_emojis(model, text):
-    sentences = sent_tokenize(text)
+    if classification_by_sentence:
+        sentences = sent_tokenize(text)
+    else:
+        sentences = [text]
     suggested_emojis_result = []
     predicted_emotions = []
     for sent in sentences:
@@ -270,11 +276,11 @@ def suggest_emojis(model, text):
 with open('info_file.json', 'r', encoding='utf-8') as file:
     data = json.load(file)
 
+
 # ucitavanje modela
 naive_bayes_model = joblib.load('models/naive_bayes_pipeline.pkl', 'r')
 logistic_regression_model = joblib.load('models/logistic_regression_pipeline.pkl', 'r')
 svm_model = joblib.load('models/svm_pipeline.pkl', 'r')
-#bilstm_model = load_model('models/bilstm_model.keras')
 roberta_model = pickle.load(open('models/RoBERTa.pkl', 'rb'))
 bert_model = ktrain.load_predictor("models/bert_model")
 
@@ -287,6 +293,7 @@ models = {'Naive Bayes': naive_bayes_model,
           }
 
 work_from_console = False
+classification_by_sentence = False
 
 if work_from_console:
     while True:
