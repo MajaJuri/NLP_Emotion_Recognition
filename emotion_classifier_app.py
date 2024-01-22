@@ -1,5 +1,10 @@
+import os
+os.environ['TF_USE_LEGACY_KERAS'] = 'True' # mora bit na pocetku prije nego se importa keras ili tensorflow
+import warnings
+warnings.filterwarnings('ignore')
 import tkinter as tk
 from tkinter import ttk, messagebox
+import ktrain
 import re
 import string
 from nltk.tokenize import word_tokenize, sent_tokenize
@@ -20,6 +25,8 @@ from PyQt5.QtGui import QFont
 from keras.models import load_model
 from keras.preprocessing.sequence import pad_sequences
 
+
+
 emotions = ['happiness',
             'fear',
             'anger',
@@ -33,7 +40,7 @@ emotions = ['happiness',
 emoji_keywords = {
     'happiness': ['smile', 'laugh'],
     'fear': ['fear'],
-    'anger': ['agry'],
+    'anger': ['angry'],
     'sadness': ['sad', 'cry', 'disappointed', 'anxious'],
     'disgust': ['vomiting', 'nauseated face'],
     'shame': ['anxious'],
@@ -202,7 +209,7 @@ class ModelInfoWindow:
         self.text_entry = tk.Text(self.root, width=40, height=5)
         self.text_entry.grid(row=3, column=0, columnspan=3, pady=10, padx=10, sticky='we')
 
-        classify_button = ttk.Button(self.root, text="Classify", command=lambda m=name_of_model: self.show_result(m),
+        classify_button = ttk.Button(self.root, text="Suggest Emojis", command=lambda m=name_of_model: self.show_result(m),
                                      width=20)
         classify_button.grid(row=3, column=3, pady=10, padx=10, sticky='w')
 
@@ -269,13 +276,13 @@ logistic_regression_model = joblib.load('models/logistic_regression_pipeline.pkl
 svm_model = joblib.load('models/svm_pipeline.pkl', 'r')
 #bilstm_model = load_model('models/bilstm_model.keras')
 roberta_model = pickle.load(open('models/RoBERTa.pkl', 'rb'))
-# bert_model = ktrain.load_predictor("models/bert_model")
+bert_model = ktrain.load_predictor("models/bert_model")
 
 models = {'Naive Bayes': naive_bayes_model,
           'Logistic Regression': logistic_regression_model,
           'SVM': svm_model,
           #'BiLSTM': bilstm_model,
-          # 'BERT': bert_model,
+          'BERT': bert_model,
           'RoBERTa': roberta_model
           }
 

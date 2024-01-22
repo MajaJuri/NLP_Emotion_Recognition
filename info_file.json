@@ -26,7 +26,7 @@
          "model_file_name":"bilstm_model"
       },
       "BERT":{
-         "info":"bert info text example",
+         "info":"BERT, or Bidirectional Encoder Representations from Transformers, represents a state-of-the-art natural language processing model known for its bidirectional contextual understanding. Operating on the transformer architecture, BERT excels in capturing intricate linguistic patterns and relationships within textual data. In the realm of emoji recommendation, BERT showcases its prowess by intelligently analyzing the context of text to suggest emotive and relevant emojis.",
          "model_file_name":"bert_model",
          "accuracy":"72%",
          "confusion_matrix_file_name":"bert_confusion_matrix.png"
@@ -38,7 +38,7 @@
          "confusion_matrix_file_name":"roberta_confusion_matrix.png"
       }
    },
-   "description":"This Emoji Suggestion Tool is a user-friendly graphical interface designed to enhance communication and expression by suggesting relevant emojis based on the emotion and the content of the input text. Once you have selected a language model that you want to generate the emoji suggestions with, you can enter text into the provided input box, the program will intelligently analyze the content offering a curated selection of emojis that complement the conveyed emotions in your input text.",
+   "description":"This Emoji Suggestion Tool is a user-friendly graphical interface designed to enhance communication by suggesting relevant emojis based on the emotion and the content of the input text. Once you have selected a language model that you want to generate the emoji suggestions with, you can enter your text into the provided input box, the program will analyze the content and then offer you a curated selection of emojis that complement the conveyed emotions in your input text.",
    "authors":"Maja Jurić, Maria Fain, Klara Iličić",
    "title":"A Comparative Study of Language Models for Emoji Suggestions"
 }
