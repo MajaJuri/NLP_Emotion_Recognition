@@ -1,5 +1,5 @@
 import os
-os.environ['TF_USE_LEGACY_KERAS'] = 'True' # mora bit na pocetku prije nego se importa keras ili tensorflow
+os.environ['TF_USE_LEGACY_KERAS'] = 'True'  # mora bit na pocetku prije nego se importa keras ili tensorflow
 import warnings
 warnings.filterwarnings('ignore')
 import tkinter as tk
