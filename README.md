@@ -13,4 +13,4 @@ For every model or group of models there is a separate Jupyter Notebook with the
 - "Llama2" - a notebook for the Llama model
 - "Phi2" - a notebook for the Phi model
 
-The "emotion_classifier_app" is a Python script for...
+The "emotion_classifier_app" is a Python script for displaying the graphical user interface our emoji recommender system. While not all of our models are presently integrated, users can choose from a lineup featuring Naive Bayes, SVM, Logistic Regression, BERT, and RoBERTa. After selecting a model, a window opens up revealing additional information about the selected model. There's also a text box ready for user input — just type in the text you'd like to receive emoji recommendations for.
