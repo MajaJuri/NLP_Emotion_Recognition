@@ -17,4 +17,4 @@ The "Emoji Recommender app" is a Python script for displaying the graphical user
 
 Due to GitHub's storage limitations, deployment of the Emoji Recommendation app is currently unavailable. However, we've prepared a video demo (Emoji Recommender app video demo.mp4) to offer you a glimpse of its functionality.
 
-To delve deeper into our research and understand the creation of the Emoji Recommender system, check out our paper, "A Comparative Study of Language Models."
+To delve deeper into our research and understand the creation of the Emoji Recommender system, check out our paper, "A Comparative Study of Language Models for Emoji Recommendations"
